@@ -25,7 +25,7 @@ class NeuralController(Controller):
     def __init__(self, agent):
         super(NeuralController, self).__init__(agent)
         self.net_input_size = agent.env.N_MOVE_DIRECTIONS*agent.env.obsrange*agent.env.N_CONTENT
-        self.net_input_size = agent.env.N_MOVE_DIRECTIONS
+        self.net_output_size = agent.env.N_MOVE_DIRECTIONS
         self.inlayer = [0 for _ in range(self.net_input_size)]
         self.outlayer = [0 for _ in range(self.net_output_size)]
         self.weights = np.array([[random.uniform(0, 0.001) for i in range(self.net_input_size)] for j in range(self.net_output_size)])
@@ -47,9 +47,12 @@ class NeuralController(Controller):
     def delta(self, i):
         pass
 
-    def updateWeights(self):
+    def training_activation(self):
+        pass
+
+    def update_weights(self):
         deltas = np.array([[self.delta(i)] for i in range(self.net_output_size)])
-        invec = np.array([self.inlayer])
+        invec = self.training_activation()
         wupdates = (deltas @ invec) * self.eta
         self.weights = np.add(self.weights, wupdates)
 
@@ -71,6 +74,9 @@ class SupervisedController(NeuralController):
             expsum += math.exp(out)
         return self.correct_choice(i)-(math.exp(self.outlayer[i])/expsum)
 
+    def training_activation(self):
+        return np.array([self.inlayer])
+
 class ReinforcementController(NeuralController):
     """docstring for ReinforcementController"""
     def __init__(self, agent):
@@ -89,4 +95,7 @@ class ReinforcementController(NeuralController):
     def delta(self, i):
         if i != self.last_move:
             return 0
-        return self.agent.reward + self.gamma*(max(self.outlayer)) - self.prevoutlayer[self.last_move]
+        return self.agent.reward + self.gamma*(max(self.outlayer)) - self.prev_outlayer[self.last_move]
+
+    def training_activation(self):
+        return np.array([self.prev_inlayer])

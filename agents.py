@@ -32,7 +32,7 @@ class SupervisedAgent(Agent):
     """docstring for SupervisedAgent
     """
     def __init__(self, env):
-        super(BaseAgent, self).__init__(env)
+        super(SupervisedAgent, self).__init__(env)
         self.controller = SupervisedController(self)
 
     def train(self):
