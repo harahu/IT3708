@@ -140,3 +140,11 @@ class FlatlandEnv(object):
         elif content == self.WALL:
             reward = self.WALL_REWARD
         return reward
+
+    def get_render_array(self):
+        cut = self.obsrange
+        return [row[cut:len(self.world)-cut] for row in self.world[cut:len(self.world)-cut]]
+
+    def get_render_agentpos(self):
+        cut = self.obsrange
+        return [self.agent_y-cut, self.agent_x-cut]
