@@ -2,7 +2,8 @@ import random, math
 import numpy as np
 
 class Controller(object):
-    """docstring for Controller"""
+    """docstring for Controller
+    """
     def __init__(self, agent):
         self.agent = agent
     
@@ -78,7 +79,8 @@ class SupervisedController(NeuralController):
         return np.array([self.inlayer])
 
 class ReinforcementController(NeuralController):
-    """docstring for ReinforcementController"""
+    """docstring for ReinforcementController
+    """
     def __init__(self, agent):
         super(ReinforcementController, self).__init__(agent)
         self.prev_inlayer = [0 for _ in range(self.net_input_size)]

@@ -4,7 +4,7 @@ class FlatlandEnv(object):
     """Flatland Environment"""
 
     ENVSIZE = 10
-    N_CONTENT= 4
+    N_CONTENT = 4
     N_MOVE_DIRECTIONS = 3
 
     #cell content
