@@ -1,9 +1,11 @@
 import random
 
-class FlatlandEnv():
+class FlatlandEnv(object):
     """Flatland Environment"""
 
     ENVSIZE = 10
+    N_CONTENT= 4
+    N_MOVE_DIRECTIONS = 3
 
     #cell content
     EMPTY = 0
@@ -31,25 +33,25 @@ class FlatlandEnv():
         """
         self.obsrange = obsrange
         padsize = obsrange+1
-        worldsize = ENVSIZE+2*padsize
+        worldsize = self.ENVSIZE+2*padsize
 
         #initiate as world filled with food
-        self.world = [[FOOD for i in range(worldsize)] for j in range(worldsize)]
+        self.world = [[self.FOOD for i in range(worldsize)] for j in range(worldsize)]
 
         #build wall padding
         for i in range(padsize):
-            self.world[i] = [WALL for i in range(worldsize)]
-            self.world[worldsize-i-1] = [WALL for i in range(worldsize)]
+            self.world[i] = [self.WALL for i in range(worldsize)]
+            self.world[worldsize-i-1] = [self.WALL for i in range(worldsize)]
         for i in range(worldsize):
             for j in range(padsize):
-                self.world[i][j] = WALL
-                self.world[i][worldsize-j-1] = WALL
+                self.world[i][j] = self.WALL
+                self.world[i][worldsize-j-1] = self.WALL
 
         # fill inn empty and posion cells
         for i in range(padsize, worldsize-padsize):
             for j in range(padsize, worldsize-padsize):
                 if random.random() > 0.5:
-                    self.world[i][j] = POISON if random.random() < 0.5 else EMPTY
+                    self.world[i][j] = self.POISON if random.random() < 0.5 else self.EMPTY
 
         #place agent somewhere within the padding
         self.agent_x = random.randrange(padsize, worldsize-padsize)
@@ -85,13 +87,13 @@ class FlatlandEnv():
         movdir = (self.agentdir + action - 1) % 4
 
         #determining change in coordinates
-        if movdir == 0:
+        if movdir == self.NORTH:
             self.agent_y -= 1
-        elif movdir == 1:
+        elif movdir == self.EAST:
             self.agent_x += 1
-        elif movdir == 2:
+        elif movdir == self.SOUTH:
             self.agent_y += 1
-        else:
+        else: #west
             self.agent_x -= 1
 
         #updating agent direction
@@ -101,14 +103,14 @@ class FlatlandEnv():
         self.moves += 1
 
         #checking episode end conditions
-        if self.moves >= self.maxmoves or get_current_cell_content() == WALL:
+        if self.moves >= self.maxmoves or self.get_current_cell_content() == self.WALL:
             self.done = True
 
         #log reward
         reward = self.get_reward()
         self.accumulated_reward += reward
 
-        set_current_cell_content(EMPTY)
+        self.set_current_cell_content(self.EMPTY)
         observation = self.get_observation()
         return observation, reward, self.done
 
@@ -118,7 +120,7 @@ class FlatlandEnv():
         east = []
         south = []
         west = []
-        for i in range(1, obsrange+1):
+        for i in range(1, self.obsrange+1):
             north.append(self.world[self.agent_y-i][self.agent_x])
             east.append(self.world[self.agent_y][self.agent_x+i])
             south.append(self.world[self.agent_y+i][self.agent_x])
@@ -127,13 +129,14 @@ class FlatlandEnv():
 
         return [nh[(self.agentdir-1)%4], nh[self.agentdir%4], nh[(self.agentdir+1)%4]]
 
-    def get_reward(self):
-        reward = FOOD_REWARD
-        content = get_current_cell_content()
-        if content == EMPTY:
-            reward = EMPTY_REWARD
-        elif content == POISON:
-            reward = POISON_REWARD
-        elif content == WALL:
-            reward = WALL_REWARD
+    def get_reward(self, content=None):
+        if content==None:
+            content = self.get_current_cell_content()
+        reward = self.FOOD_REWARD
+        if content == self.EMPTY:
+            reward = self.EMPTY_REWARD
+        elif content == self.POISON:
+            reward = self.POISON_REWARD
+        elif content == self.WALL:
+            reward = self.WALL_REWARD
         return reward
