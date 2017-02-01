@@ -24,23 +24,36 @@ WINDOWWIDTH = (CELLWIDTH+1)*CELLNUM-1
 WINDOWHEIGHT = (CELLHEIGHT+1)*CELLNUM-1
 
 def top_left(y, x):
-    return (CELLWIDTH+1)*y, (CELLHEIGHT+1)*x
+    return (CELLHEIGHT+1)*x, (CELLWIDTH+1)*y
 
 def center(y, x):
     center_y = (CELLHEIGHT+1)*y + math.ceil(CELLHEIGHT/2)
     center_x = (CELLWIDTH+1)*x + math.ceil(CELLWIDTH/2)
-    return (center_y, center_x)
+    return (center_x, center_y)
+
+def center_offset(y, x, direction):
+    offset = 15
+    center_x, center_y = center(y, x)
+    if direction == 0:
+        return center_x, center_y-15
+    elif direction == 1:
+        return center_x+15, center_y
+    elif direction == 2:
+        return center_x, center_y+15
+    else:
+        return center_x-15, center_y
 
 def render_env(env):
     world = env.get_render_array()
     for y in range(len(world)):
         for x in range(len(world)):
-            corner_y, corner_x = top_left(y, x)
-            pygame.draw.rect(windowSurface, WHITE, (corner_y, corner_x, CELLWIDTH, CELLHEIGHT), 0)
+            corner_x, corner_y = top_left(y, x)
+            pygame.draw.rect(windowSurface, WHITE, (corner_x, corner_y, CELLWIDTH, CELLHEIGHT), 0)
             cell_center = center(y, x)
             pygame.draw.circle(windowSurface, CELL_COLOR[world[y][x]], cell_center, math.ceil(CELLWIDTH/3), 0)
     agent = env.get_render_agentpos()
     pygame.draw.circle(windowSurface, BLUE, center(agent[0], agent[1]), math.ceil(CELLWIDTH/4), 0)
+    pygame.draw.circle(windowSurface, BLUE, center_offset(agent[0], agent[1], env.agentdir), math.ceil(CELLWIDTH/8), 0)
 
 def run_base_agent(rounds):
     score = 0
