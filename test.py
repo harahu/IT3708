@@ -44,7 +44,6 @@ def reitest(nrounds):
             meanscore += agent.env.accumulated_reward
         meanscore /= len(envs)
         scores.append(meanscore)
-    print(agent.controller.weights)
     return scores
 
 def reitestex(nrounds):
